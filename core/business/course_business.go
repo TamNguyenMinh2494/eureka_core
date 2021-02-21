@@ -25,6 +25,11 @@ func (b *CourseBusiness) GetOneById(id string) (models.Course, error) {
 	return *course, nil
 }
 
+func (b *CourseBusiness) IsAuthor(courseId string, email string) bool {
+	r := b.DB.Collection("courses").FindOne(context.TODO(), bson.M{"id": courseId, "author_email": email})
+	return r.Err() == nil
+}
+
 func (b *CourseBusiness) GetByAuthor(email string) ([]models.Course, error) {
 	cursor, err := b.DB.Collection("courses").Find(context.TODO(), bson.M{"author_email": email})
 	if err != nil {

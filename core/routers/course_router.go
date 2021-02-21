@@ -3,6 +3,7 @@ package routers
 import (
 	"main/core"
 	"main/core/business"
+	"main/core/models"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -51,4 +52,60 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		}
 		return c.JSON(http.StatusOK, courses)
 	})
+
+	r.g.POST("/", func(c echo.Context) (err error) {
+		authUser := c.Get("user").(map[string]interface{})
+		newCourse := new(models.Course)
+
+		if err = c.Bind(newCourse); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		if err = c.Validate(newCourse); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		newCourse.AuthorEmail = authUser["email"].(string)
+		err = course.Create(*newCourse)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		return c.NoContent(http.StatusOK)
+	}, s.AuthWiddlewareJWT.Auth)
+
+	r.g.PUT("/", func(c echo.Context) (err error) {
+		authUser := c.Get("user").(map[string]interface{})
+		updatedCourse := new(models.Course)
+
+		if err = c.Bind(updatedCourse); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		if err = c.Validate(updatedCourse); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+
+		if !course.IsAuthor(updatedCourse.Id, authUser["email"].(string)) {
+			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{"message": "Cannot modify nonpossession course"})
+		}
+
+		err = course.Update(updatedCourse.Id, *updatedCourse)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		return c.NoContent(http.StatusOK)
+	}, s.AuthWiddlewareJWT.Auth)
+
+	r.g.DELETE("/", func(c echo.Context) (err error) {
+		authUser := c.Get("user").(map[string]interface{})
+		courseId := c.QueryParam("id")
+
+		if !course.IsAuthor(courseId, authUser["email"].(string)) {
+			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{"message": "Cannot delete nonpossession course"})
+		}
+
+		err = course.Delete(courseId)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		return c.NoContent(http.StatusOK)
+	}, s.AuthWiddlewareJWT.Auth)
+
 }
