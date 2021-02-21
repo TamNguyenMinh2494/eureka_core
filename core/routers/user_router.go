@@ -5,6 +5,7 @@ import (
 	"main/core/business"
 	"main/core/models"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -21,12 +22,56 @@ func (r *UserRouter) Connect(s *core.Server) {
 		DB: s.DB,
 	}
 
+	account := business.AccountBusiness{
+		DB: s.DB,
+	}
+
+	transaction := business.TransactionBusiness{
+		DB: s.DB,
+	}
+
+	enrollment := business.EnrollmentBusiness{
+		DB: s.DB,
+	}
+
+	course := business.CourseBusiness{
+		DB: s.DB,
+	}
+
 	user.CreateIndexes()
+	account.CreateIndexes()
 
 	r.g.GET("/", func(c echo.Context) error {
 		authUser := c.Get("user")
 		return c.JSON(http.StatusOK, authUser)
 	}, s.AuthWiddlewareJWT.Auth)
+
+	r.g.GET("account", func(c echo.Context) error {
+		authUser := c.Get("user").(map[string]interface{})
+		account, err := account.Get(authUser["email"].(string))
+		if err != nil {
+			return echo.ErrInternalServerError
+		}
+		return c.JSON(http.StatusOK, account)
+	}, s.AuthWiddlewareJWT.Auth)
+
+	r.g.GET("transactions", func(c echo.Context) error {
+		authUser := c.Get("user").(map[string]interface{})
+		transactions, err := transaction.Get(authUser["email"].(string), "")
+		if err != nil {
+			return echo.ErrInternalServerError
+		}
+		return c.JSON(http.StatusOK, transactions)
+	})
+
+	r.g.GET("courses", func(c echo.Context) error {
+		authUser := c.Get("user").(map[string]interface{})
+		enrollments, err := enrollment.GetByEmail(authUser["email"].(string))
+		if err != nil {
+			return echo.ErrInternalServerError
+		}
+		return c.JSON(http.StatusOK, enrollments)
+	})
 
 	r.g.POST("/", func(c echo.Context) (err error) {
 		authUser := c.Get("user").(map[string]interface{})
@@ -49,8 +94,42 @@ func (r *UserRouter) Connect(s *core.Server) {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 
+		err = account.Create(profile.Email)
+
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+
 		return c.JSON(http.StatusOK, profile)
 	}, s.AuthWiddlewareJWT.Auth)
+
+	r.g.POST("enroll", func(c echo.Context) error {
+		authUser := c.Get("user").(map[string]interface{})
+		courseId := c.QueryParam("course")
+		enrollingCourse, err := course.GetOneById(courseId)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		if !enrollingCourse.AllowEnroll {
+			return echo.NewHTTPError(http.StatusBadRequest, "Cannot enroll the course")
+		}
+		if enrollingCourse.StartDate > time.Now().Unix() {
+			return echo.NewHTTPError(http.StatusBadRequest, "The course does not start")
+		}
+		if enrollingCourse.IsPublic {
+			err = transaction.Purchase(&account, &models.Transaction{
+				Email:    authUser["email"].(string),
+				SKU:      courseId,
+				Quantity: 1,
+				Amount:   -enrollingCourse.Fee,
+			})
+			if err != nil {
+				return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+			}
+		}
+
+		return c.NoContent(http.StatusOK)
+	})
 
 	// [PUT] Input: Body (UserProfileUpdated)
 
