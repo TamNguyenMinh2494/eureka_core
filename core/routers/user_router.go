@@ -38,6 +38,10 @@ func (r *UserRouter) Connect(s *core.Server) {
 		DB: s.DB,
 	}
 
+	invitation := business.InvitationBusiness{
+		DB: s.DB,
+	}
+
 	user.CreateIndexes()
 	account.CreateIndexes()
 
@@ -116,16 +120,22 @@ func (r *UserRouter) Connect(s *core.Server) {
 		if enrollingCourse.StartDate > time.Now().Unix() {
 			return echo.NewHTTPError(http.StatusBadRequest, "The course does not start")
 		}
-		if enrollingCourse.IsPublic {
-			err = transaction.Purchase(&account, &models.Transaction{
-				Email:    authUser["email"].(string),
-				SKU:      courseId,
-				Quantity: 1,
-				Amount:   -enrollingCourse.Fee,
-			})
-			if err != nil {
-				return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-			}
+
+		if !enrollingCourse.IsPublic && !invitation.IsInvited(&models.StudentInvitation{
+			CourseId: enrollingCourse.Id,
+			Email:    authUser["email"].(string),
+		}) {
+			return echo.NewHTTPError(http.StatusBadRequest, "Cannot access the course")
+		}
+
+		err = transaction.Purchase(&account, &models.Transaction{
+			Email:    authUser["email"].(string),
+			SKU:      courseId,
+			Quantity: 1,
+			Amount:   -enrollingCourse.Fee,
+		})
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
 
 		return c.NoContent(http.StatusOK)
