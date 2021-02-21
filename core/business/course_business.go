@@ -71,7 +71,7 @@ func (b *CourseBusiness) Create(course models.Course) error {
 
 func (b *CourseBusiness) Update(id string, course models.Course) error {
 	updatedResult := b.DB.Collection("courses").FindOneAndUpdate(context.TODO(),
-		bson.M{"_id": id},
+		bson.M{"id": id},
 		bson.M{"$set": course})
 	if updatedResult.Err() != nil {
 		return updatedResult.Err()
@@ -80,7 +80,7 @@ func (b *CourseBusiness) Update(id string, course models.Course) error {
 }
 
 func (b *CourseBusiness) Delete(id string) error {
-	_, err := b.DB.Collection("courses").DeleteOne(context.TODO(), bson.M{"_id": id})
+	_, err := b.DB.Collection("courses").DeleteOne(context.TODO(), bson.M{"id": id})
 	if err != nil {
 		return err
 	}
