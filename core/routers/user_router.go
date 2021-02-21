@@ -129,7 +129,7 @@ func (r *UserRouter) Connect(s *core.Server) {
 		}
 
 		return c.NoContent(http.StatusOK)
-	})
+	}, s.AuthWiddlewareJWT.Auth)
 
 	// [PUT] Input: Body (UserProfileUpdated)
 
