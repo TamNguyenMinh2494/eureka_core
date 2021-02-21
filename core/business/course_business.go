@@ -1,0 +1,88 @@
+package business
+
+import (
+	"context"
+	"main/core/models"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+)
+
+type CourseBusiness struct {
+	DB *mongo.Database
+}
+
+func (b *CourseBusiness) GetOneById(id string) (models.Course, error) {
+	course := new(models.Course)
+	result := b.DB.Collection("courses").FindOne(context.TODO(), bson.M{"_id": id})
+	if result.Err() != nil {
+		return *course, result.Err()
+	}
+	err := result.Decode(course)
+	if err != nil {
+		return *course, err
+	}
+	return *course, nil
+}
+
+func (b *CourseBusiness) GetByAuthor(email string) ([]models.Course, error) {
+	cursor, err := b.DB.Collection("courses").Find(context.TODO(), bson.M{"author_email": email})
+	if err != nil {
+		return nil, err
+	}
+	courses := make([]models.Course, 0)
+	//utils.CursorToList(context.TODO(), cursor, courses) // !!! Wait for testing
+	for cursor.Next(context.TODO()) {
+		course := new(models.Course)
+		err = cursor.Decode(course)
+		if err != nil {
+			return nil, err
+		}
+		courses = append(courses, *course)
+	}
+	return courses, nil
+}
+
+func (b *CourseBusiness) GetPublic() ([]models.Course, error) {
+	cursor, err := b.DB.Collection("courses").Find(context.TODO(), bson.M{"is_public": true})
+	if err != nil {
+		return nil, err
+	}
+	courses := make([]models.Course, 0)
+	//utils.CursorToList(context.TODO(), cursor, courses) // !!! Wait for testing
+	for cursor.Next(context.TODO()) {
+		course := new(models.Course)
+		err = cursor.Decode(course)
+		if err != nil {
+			return nil, err
+		}
+		courses = append(courses, *course)
+	}
+	return courses, nil
+}
+
+func (b *CourseBusiness) Create(course models.Course) error {
+	_, err := b.DB.Collection("courses").InsertOne(context.TODO(), course)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (b *CourseBusiness) Update(id string, course models.Course) error {
+	updatedResult := b.DB.Collection("courses").FindOneAndUpdate(context.TODO(),
+		bson.M{"_id": id},
+		bson.M{"$set": course})
+	if updatedResult.Err() != nil {
+		return updatedResult.Err()
+	}
+	return nil
+}
+
+func (b *CourseBusiness) Delete(id string) error {
+	_, err := b.DB.Collection("courses").DeleteOne(context.TODO(), bson.M{"_id": id})
+	if err != nil {
+		return err
+	}
+	return nil
+}
