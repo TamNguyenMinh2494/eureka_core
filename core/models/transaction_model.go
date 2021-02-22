@@ -5,5 +5,5 @@ type Transaction struct {
 	SKU       string `json:"sku" validate:"required"`
 	Quantity  int64  `json:"quantity" validate:"required"`
 	Amount    int64  `json:"amount" validate:"required"`
-	timestamp string `json:"timestamp" validate:"required"`
+	Timestamp string `json:"timestamp" validate:"required"`
 }

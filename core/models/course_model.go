@@ -1,5 +1,7 @@
 package models
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type Course struct {
 	Id               string `json:"id" validate:"required"` // User-friendly ID
 	Name             string `json:"name" validate:"required"`
@@ -14,10 +16,10 @@ type Course struct {
 }
 
 type CourseSection struct {
-	SectionId string `json:"section_id" validate:"required"`
-	CourseId  string `json:"course_id" validate:"required"`
-	Name      string `json:"name" validate:"required"`
-	Parent    string `json:"parent"`
-	PhotoUrl  string `json:"photo_url"`
-	Content   string `json:"content"`
+	Id       primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+	CourseId string             `json:"course_id" validate:"required"`
+	Name     string             `json:"name" validate:"required"`
+	Parent   string             `json:"parent"`
+	PhotoUrl string             `json:"photo_url"`
+	Content  string             `json:"content"`
 }

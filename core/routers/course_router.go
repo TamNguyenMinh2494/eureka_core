@@ -45,7 +45,7 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		}
 	}, s.AuthWiddlewareJWT.Auth)
 
-	r.g.GET("listing", func(c echo.Context) error {
+	r.g.GET("/listing", func(c echo.Context) error {
 		courses, err := course.GetPublic()
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -53,7 +53,7 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		return c.JSON(http.StatusOK, courses)
 	})
 
-	r.g.GET("sections", func(c echo.Context) error {
+	r.g.GET("/sections", func(c echo.Context) error {
 		courseId := c.QueryParam("course")
 		sections, err := courseSection.GetSectionsByCourse(courseId)
 		if err != nil {
@@ -62,7 +62,7 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		return c.JSON(http.StatusOK, sections)
 	})
 
-	r.g.GET("enrollment", func(c echo.Context) error {
+	r.g.GET("/enrollment", func(c echo.Context) error {
 		courseId := c.QueryParam("course")
 		enrols, err := enrollment.GetByCourseId(courseId)
 		if err != nil {
@@ -90,7 +90,7 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		return c.NoContent(http.StatusOK)
 	}, s.AuthWiddlewareJWT.Auth)
 
-	r.g.POST("sections", func(c echo.Context) (err error) {
+	r.g.POST("/sections", func(c echo.Context) (err error) {
 		authUser := c.Get("user").(map[string]interface{})
 		section := new(models.CourseSection)
 
@@ -134,7 +134,7 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		return c.NoContent(http.StatusOK)
 	}, s.AuthWiddlewareJWT.Auth)
 
-	r.g.PUT("sections", func(c echo.Context) (err error) {
+	r.g.PUT("/sections", func(c echo.Context) (err error) {
 		authUser := c.Get("user").(map[string]interface{})
 		section := new(models.CourseSection)
 
@@ -170,7 +170,7 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		return c.NoContent(http.StatusOK)
 	}, s.AuthWiddlewareJWT.Auth)
 
-	r.g.DELETE("sections", func(c echo.Context) (err error) {
+	r.g.DELETE("/sections", func(c echo.Context) (err error) {
 		authUser := c.Get("user").(map[string]interface{})
 		courseId := c.QueryParam("course")
 		sectionId := c.QueryParam("section")

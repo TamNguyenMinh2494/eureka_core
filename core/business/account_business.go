@@ -35,6 +35,7 @@ func (b *AccountBusiness) Get(email string) (account *models.Account, err error)
 	if result.Err() != nil {
 		return nil, result.Err()
 	}
+	account = new(models.Account)
 	err = result.Decode(account)
 	if err != nil {
 		return nil, err

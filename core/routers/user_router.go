@@ -50,7 +50,7 @@ func (r *UserRouter) Connect(s *core.Server) {
 		return c.JSON(http.StatusOK, authUser)
 	}, s.AuthWiddlewareJWT.Auth)
 
-	r.g.GET("account", func(c echo.Context) error {
+	r.g.GET("/account", func(c echo.Context) error {
 		authUser := c.Get("user").(map[string]interface{})
 		account, err := account.Get(authUser["email"].(string))
 		if err != nil {
@@ -59,23 +59,23 @@ func (r *UserRouter) Connect(s *core.Server) {
 		return c.JSON(http.StatusOK, account)
 	}, s.AuthWiddlewareJWT.Auth)
 
-	r.g.GET("transactions", func(c echo.Context) error {
+	r.g.GET("/transactions", func(c echo.Context) error {
 		authUser := c.Get("user").(map[string]interface{})
 		transactions, err := transaction.Get(authUser["email"].(string), "")
 		if err != nil {
 			return echo.ErrInternalServerError
 		}
 		return c.JSON(http.StatusOK, transactions)
-	})
+	}, s.AuthWiddlewareJWT.Auth)
 
-	r.g.GET("courses", func(c echo.Context) error {
+	r.g.GET("/courses", func(c echo.Context) error {
 		authUser := c.Get("user").(map[string]interface{})
 		enrollments, err := enrollment.GetByEmail(authUser["email"].(string))
 		if err != nil {
 			return echo.ErrInternalServerError
 		}
 		return c.JSON(http.StatusOK, enrollments)
-	})
+	}, s.AuthWiddlewareJWT.Auth)
 
 	r.g.POST("/", func(c echo.Context) (err error) {
 		authUser := c.Get("user").(map[string]interface{})
@@ -107,7 +107,7 @@ func (r *UserRouter) Connect(s *core.Server) {
 		return c.JSON(http.StatusOK, profile)
 	}, s.AuthWiddlewareJWT.Auth)
 
-	r.g.POST("enroll", func(c echo.Context) error {
+	r.g.POST("/enroll", func(c echo.Context) error {
 		authUser := c.Get("user").(map[string]interface{})
 		courseId := c.QueryParam("course")
 		enrollingCourse, err := course.GetOneById(courseId)

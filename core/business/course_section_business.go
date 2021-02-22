@@ -30,7 +30,7 @@ func (b *CourseSectionBusiness) GetSectionsByCourse(courseId string) ([]models.C
 }
 
 func (b *CourseSectionBusiness) HasSection(courseId string, sectionId string) bool {
-	r := b.DB.Collection("course_sections").FindOne(context.TODO(), bson.M{"course_id": courseId, "section_id": sectionId})
+	r := b.DB.Collection("course_sections").FindOne(context.TODO(), bson.M{"course_id": courseId, "_id": sectionId})
 	return r.Err() == nil
 }
 
