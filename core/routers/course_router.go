@@ -53,6 +53,25 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		return c.JSON(http.StatusOK, courses)
 	})
 
+	r.g.GET("sections", func(c echo.Context) error {
+		courseId := c.QueryParam("course")
+		sections, err := courseSection.GetSectionsByCourse(courseId)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		return c.JSON(http.StatusOK, sections)
+	})
+
+	r.g.GET("enrollment", func(c echo.Context) error {
+		courseId := c.QueryParam("course")
+		enrols, err := enrollment.GetByCourseId(courseId)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		return c.JSON(http.StatusOK, enrols)
+
+	})
+
 	r.g.POST("/", func(c echo.Context) (err error) {
 		authUser := c.Get("user").(map[string]interface{})
 		newCourse := new(models.Course)
@@ -70,6 +89,28 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		}
 		return c.NoContent(http.StatusOK)
 	}, s.AuthWiddlewareJWT.Auth)
+
+	r.g.POST("sections", func(c echo.Context) (err error) {
+		authUser := c.Get("user").(map[string]interface{})
+		section := new(models.CourseSection)
+
+		if err = c.Bind(section); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		if err = c.Validate(section); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+
+		if !course.IsAuthor(section.CourseId, authUser["email"].(string)) {
+			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{"message": "Cannot modify nonpossession course"})
+		}
+
+		err = courseSection.Create(section)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		return c.NoContent(http.StatusOK)
+	})
 
 	r.g.PUT("/", func(c echo.Context) (err error) {
 		authUser := c.Get("user").(map[string]interface{})
@@ -93,6 +134,27 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		return c.NoContent(http.StatusOK)
 	}, s.AuthWiddlewareJWT.Auth)
 
+	r.g.PUT("sections", func(c echo.Context) (err error) {
+		authUser := c.Get("user").(map[string]interface{})
+		section := new(models.CourseSection)
+
+		if err = c.Bind(section); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		if err = c.Validate(section); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+
+		if !course.IsAuthor(section.CourseId, authUser["email"].(string)) {
+			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{"message": "Cannot modify nonpossession course"})
+		}
+		err = courseSection.Update(section.CourseId, *section)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		return c.NoContent(http.StatusOK)
+	})
+
 	r.g.DELETE("/", func(c echo.Context) (err error) {
 		authUser := c.Get("user").(map[string]interface{})
 		courseId := c.QueryParam("id")
@@ -102,6 +164,30 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		}
 
 		err = course.Delete(courseId)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		return c.NoContent(http.StatusOK)
+	}, s.AuthWiddlewareJWT.Auth)
+
+	r.g.DELETE("sections", func(c echo.Context) (err error) {
+		authUser := c.Get("user").(map[string]interface{})
+		courseId := c.QueryParam("course")
+		sectionId := c.QueryParam("section")
+
+		if !courseSection.HasSection(sectionId, courseId) {
+			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{"message": "The course does not contain this section"})
+		}
+
+		selectedCourse, err := course.GetOneById(courseId)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		if !course.IsAuthor(selectedCourse.Id, authUser["email"].(string)) {
+			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{"message": "Cannot delete nonpossession course"})
+		}
+
+		err = courseSection.Delete(sectionId)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}

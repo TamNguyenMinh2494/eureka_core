@@ -14,9 +14,10 @@ type Course struct {
 }
 
 type CourseSection struct {
-	CourseId string `json:"course_id" validate:"required"`
-	Name     string `json:"name" validate:"required"`
-	Parent   string `json:"parent"`
-	PhotoUrl string `json:"photo_url"`
-	Content  string `json:"content"`
+	SectionId string `json:"section_id" validate:"required"`
+	CourseId  string `json:"course_id" validate:"required"`
+	Name      string `json:"name" validate:"required"`
+	Parent    string `json:"parent"`
+	PhotoUrl  string `json:"photo_url"`
+	Content   string `json:"content"`
 }

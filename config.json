@@ -1,5 +1,5 @@
 {
-    "address": ":8081",
+    "address": ":8080",
     "connectionURL": "mongodb+srv://admin:admin@cluster0.oxl8a.mongodb.net/eureka_dev?retryWrites=true&w=majority",
     "db_name": "eureka_dev",
     "firebase_key": "firebase_key.json",
