@@ -7,6 +7,7 @@ import (
 	"main/core/question"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -16,7 +17,11 @@ type QuizBusiness struct {
 
 func (b *QuizBusiness) GetById(id string) (models.Quiz, error) {
 	quiz := new(models.Quiz)
-	r := b.DB.Collection("question_bank").FindOne(context.TODO(), bson.M{"_id": id})
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return *quiz, err
+	}
+	r := b.DB.Collection("question_bank").FindOne(context.TODO(), bson.M{"_id": objectId})
 	if r.Err() != nil {
 		return *quiz, r.Err()
 	}
@@ -49,12 +54,20 @@ func (b *QuizBusiness) Create(quiz *models.Quiz) error {
 }
 
 func (b *QuizBusiness) Update(quiz *models.Quiz) error {
+	// objectId, err := primitive.ObjectIDFromHex(quiz.id)
+	// if err != nil {
+	// 	return *quiz, err
+	// }
 	r := b.DB.Collection("question_bank").FindOneAndUpdate(context.TODO(), bson.M{"_id": quiz.Id}, bson.M{"$set": quiz})
 	return r.Err()
 }
 
 func (b *QuizBusiness) Delete(id string) error {
-	_, err := b.DB.Collection("question_bank").DeleteOne(context.TODO(), bson.M{"_id": id})
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	_, err = b.DB.Collection("question_bank").DeleteOne(context.TODO(), bson.M{"_id": objectId})
 	return err
 }
 
