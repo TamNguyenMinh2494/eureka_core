@@ -193,7 +193,7 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		if !course.IsAuthor(section.CourseId, authUser["email"].(string)) {
 			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{"message": "Cannot modify nonpossession course"})
 		}
-		err = courseSection.Update(section.CourseId, *section)
+		err = courseSection.Update(*section)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}

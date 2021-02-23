@@ -101,5 +101,5 @@ func (f *Course) UpdateSection(email string, section *models.CourseSection) erro
 			return errors.New("The parent is not in the course")
 		}
 	}
-	return f.CourseSection.Update(section)
+	return f.CourseSection.Update(*section)
 }

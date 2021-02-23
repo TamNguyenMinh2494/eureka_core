@@ -41,9 +41,9 @@ func (b *CourseSectionBusiness) Create(section *models.CourseSection) error {
 	return err
 }
 
-func (b *CourseSectionBusiness) Update(id string, section models.CourseSection) error {
+func (b *CourseSectionBusiness) Update(section models.CourseSection) error {
 	updatedResult := b.DB.Collection("course_sections").FindOneAndUpdate(context.TODO(),
-		bson.M{"id": id},
+		bson.M{"_id": section.Id.String()},
 		bson.M{"$set": section})
 	if updatedResult.Err() != nil {
 		return updatedResult.Err()
@@ -52,7 +52,7 @@ func (b *CourseSectionBusiness) Update(id string, section models.CourseSection) 
 }
 
 func (b *CourseSectionBusiness) Delete(id string) error {
-	_, err := b.DB.Collection("course_sections").DeleteOne(context.TODO(), bson.M{"id": id})
+	_, err := b.DB.Collection("course_sections").DeleteOne(context.TODO(), bson.M{"_id": id})
 	if err != nil {
 		return err
 	}
