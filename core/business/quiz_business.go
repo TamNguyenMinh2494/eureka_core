@@ -25,7 +25,7 @@ func (b *QuizBusiness) GetById(id string) (models.Quiz, error) {
 	if r.Err() != nil {
 		return *quiz, r.Err()
 	}
-	err := r.Decode(quiz)
+	err = r.Decode(quiz)
 	return *quiz, err
 }
 
