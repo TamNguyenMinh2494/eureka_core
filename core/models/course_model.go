@@ -9,8 +9,8 @@ type Course struct {
 	AuthorEmail      string `json:"author_email" validate:"required"`
 	Fee              int64  `json:"fee" validate:"required"`
 	StartDate        int64  `json:"start_date"`
-	AllowEnroll      bool   `json:"allow_enroll" validate:"required"`
-	IsPublic         bool   `json:"is_public" validate:"required"`
+	AllowEnroll      bool   `json:"allow_enroll" binding:"required"`
+	IsPublic         bool   `json:"is_public" binding:"required"`
 	PhotoUrl         string `json:"photo_url"`
 	MarketingContent string `json:"marketing_content"`
 }
