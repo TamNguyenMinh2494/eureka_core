@@ -25,7 +25,22 @@ func (b *QuizBusiness) GetById(id string) (models.Quiz, error) {
 }
 
 func (b *QuizBusiness) GetByCourse(courseId string) ([]models.Quiz, error) {
+	cursor, err := b.DB.Collection("question_bank").Find(context.TODO(), bson.M{"course_id": courseId})
+	if err != nil {
+		return nil, err
+	}
 
+	quizes := make([]models.Quiz, 0)
+
+	for cursor.Next(context.TODO()) {
+		quiz := new(models.Quiz)
+		err = cursor.Decode(quiz)
+		if err != nil {
+			return quizes, err
+		}
+		quizes = append(quizes, *quiz)
+	}
+	return quizes, nil
 }
 
 func (b *QuizBusiness) Create(quiz *models.Quiz) error {
