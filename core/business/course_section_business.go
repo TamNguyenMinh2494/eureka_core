@@ -5,6 +5,7 @@ import (
 	"main/core/models"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -35,6 +36,7 @@ func (b *CourseSectionBusiness) HasSection(courseId string, sectionId string) bo
 }
 
 func (b *CourseSectionBusiness) Create(section *models.CourseSection) error {
+	section.Id = primitive.NewObjectID()
 	_, err := b.DB.Collection("course_sections").InsertOne(context.TODO(), section)
 	return err
 }

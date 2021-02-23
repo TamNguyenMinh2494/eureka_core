@@ -3,6 +3,7 @@ package routers
 import (
 	"main/core"
 	"main/core/business"
+	"main/core/flow"
 	"main/core/models"
 	"net/http"
 
@@ -29,6 +30,22 @@ func (r *CourseRouter) Connect(s *core.Server) {
 	courseSection := business.CourseSectionBusiness{
 		DB: s.DB,
 	}
+
+	user := business.UserBusiness{
+		DB: s.DB,
+	}
+
+	quiz := business.QuizBusiness{
+		DB: s.DB,
+	}
+
+	courseFlow := flow.Course{
+		Course:        &course,
+		CourseSection: &courseSection,
+		User:          &user,
+		Quiz:          &quiz,
+	}
+
 	r.g.GET("/", func(c echo.Context) (err error) {
 		authUser := c.Get("user").(map[string]interface{})
 		courseId := c.QueryParam("id")
