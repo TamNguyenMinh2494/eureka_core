@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -24,6 +25,7 @@ func (b *EnrollmentBusiness) Enroll(enrollment *models.Enrollment) error {
 	if b.IsEnroll(enrollment.CourseID, enrollment.Email) {
 		return errors.New("User enrolled")
 	}
+	enrollment.Id = primitive.NewObjectID()
 	_, err := b.DB.Collection("enrollments").InsertOne(context.TODO(), enrollment)
 	return err
 }
