@@ -197,9 +197,9 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		return c.NoContent(http.StatusOK)
 	}, s.AuthWiddlewareJWT.Auth)
 
-	r.g.PUT("/quiz", func(c echo.Context) error {
+	// r.g.PUT("/quiz", func(c echo.Context) error {
 
-	})
+	// })
 
 	r.g.DELETE("/", func(c echo.Context) (err error) {
 		authUser := c.Get("user").(map[string]interface{})
