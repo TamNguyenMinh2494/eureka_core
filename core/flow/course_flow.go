@@ -4,6 +4,7 @@ import (
 	"errors"
 	"main/core/business"
 	"main/core/models"
+	"main/core/utils"
 )
 
 type Course struct {
@@ -63,4 +64,42 @@ func (f *Course) DeleteQuiz(email string, courseId string, quizId string) error 
 		return errors.New("This quiz does not exist in the course")
 	}
 	return f.Quiz.Delete(quizId)
+}
+
+func (f *Course) CreateSection(email string, section *models.CourseSection) error {
+	if !f.Course.IsAuthor(section.CourseId, email) {
+		return errors.New("Cannot create section for nonpossession course")
+	}
+	if section.Parent != "" {
+		sections, err := f.CourseSection.GetSectionsByCourse(section.CourseId)
+		if err != nil {
+			return err
+		}
+		ind, _ := utils.Find(sections, func(index int, elem interface{}) bool {
+			return elem.(models.CourseSection).Id.String() == section.Parent
+		})
+		if ind == -1 {
+			return errors.New("The parent is not in the course")
+		}
+	}
+	return f.CourseSection.Create(section)
+}
+
+func (f *Course) UpdateSection(email string, section *models.CourseSection) error {
+	if !f.Course.IsAuthor(section.CourseId, email) {
+		return errors.New("Cannot update section for nonpossession course")
+	}
+	if section.Parent != "" {
+		sections, err := f.CourseSection.GetSectionsByCourse(section.CourseId)
+		if err != nil {
+			return err
+		}
+		ind, _ := utils.Find(sections, func(index int, elem interface{}) bool {
+			return elem.(models.CourseSection).Id.String() == section.Parent
+		})
+		if ind == -1 {
+			return errors.New("The parent is not in the course")
+		}
+	}
+	return f.CourseSection.Update(section)
 }
