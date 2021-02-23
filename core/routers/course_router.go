@@ -91,6 +91,16 @@ func (r *CourseRouter) Connect(s *core.Server) {
 
 	})
 
+	r.g.GET("/quiz", func(c echo.Context) error {
+		email := c.Get("user").(map[string]interface{})["email"].(string)
+		courseId := c.QueryParam("course")
+		courses, err := courseFlow.GetQuiz(email, courseId)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		return c.JSON(http.StatusOK, courses)
+	}, s.AuthWiddlewareJWT.Auth)
+
 	r.g.POST("/", func(c echo.Context) (err error) {
 		authUser := c.Get("user").(map[string]interface{})
 		newCourse := new(models.Course)
@@ -128,6 +138,22 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
+		return c.NoContent(http.StatusOK)
+	}, s.AuthWiddlewareJWT.Auth)
+
+	r.g.POST("/quiz", func(c echo.Context) (err error) {
+		authUser := c.Get("user").(map[string]interface{})
+		courseId := c.QueryParam("course")
+		quiz := new(models.Quiz)
+
+		if err = c.Bind(quiz); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		if err = c.Validate(quiz); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+
+		courseFlow.CreateQuiz(authUser["email"].(string), courseId, quiz)
 		return c.NoContent(http.StatusOK)
 	}, s.AuthWiddlewareJWT.Auth)
 
@@ -173,6 +199,10 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		}
 		return c.NoContent(http.StatusOK)
 	}, s.AuthWiddlewareJWT.Auth)
+
+	r.g.PUT("/quiz", func(c echo.Context) error {
+
+	})
 
 	r.g.DELETE("/", func(c echo.Context) (err error) {
 		authUser := c.Get("user").(map[string]interface{})
