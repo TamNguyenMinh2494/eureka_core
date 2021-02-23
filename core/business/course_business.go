@@ -6,10 +6,18 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type CourseBusiness struct {
 	DB *mongo.Database
+}
+
+func (b *CourseBusiness) CreateIndexes() {
+	b.DB.Collection("courses").Indexes().CreateOne(context.TODO(), mongo.IndexModel{
+		Keys:    bson.M{"id": 1},
+		Options: options.Index().SetUnique(true),
+	})
 }
 
 func (b *CourseBusiness) GetOneById(id string) (models.Course, error) {

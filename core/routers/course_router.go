@@ -24,6 +24,8 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		DB: s.DB,
 	}
 
+	course.CreateIndexes()
+
 	courseSection := business.CourseSectionBusiness{
 		DB: s.DB,
 	}
