@@ -36,7 +36,7 @@ func (f *Course) UpdateQuiz(email string, courseId string, quiz *models.Quiz) er
 	if !f.Course.IsAuthor(courseId, email) {
 		return errors.New("Cannot update quiz for nonpossession course")
 	}
-	quizFromDB, err := f.Quiz.GetById(quiz.Id.String())
+	quizFromDB, err := f.Quiz.GetById(quiz.Id.Hex())
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func (f *Course) CreateSection(email string, section *models.CourseSection) erro
 			return err
 		}
 		ind, _ := utils.Find(sections, func(index int, elem interface{}) bool {
-			return elem.(models.CourseSection).Id.String() == section.Parent
+			return elem.(models.CourseSection).Id.Hex() == section.Parent
 		})
 		if ind == -1 {
 			return errors.New("The parent is not in the course")
@@ -95,7 +95,7 @@ func (f *Course) UpdateSection(email string, section *models.CourseSection) erro
 			return err
 		}
 		ind, _ := utils.Find(sections, func(index int, elem interface{}) bool {
-			return elem.(models.CourseSection).Id.String() == section.Parent
+			return elem.(models.CourseSection).Id.Hex() == section.Parent
 		})
 		if ind == -1 {
 			return errors.New("The parent is not in the course")
@@ -114,7 +114,7 @@ func (f *Course) DeleteSection(email string, courseId string, sectionId string) 
 	}
 	ind, _ := utils.Find(sections, func(index int, elem interface{}) bool {
 		s := elem.(models.CourseSection)
-		return s.Id.String() != sectionId && s.Parent == sectionId
+		return s.Id.Hex() != sectionId && s.Parent == sectionId
 	})
 
 	if ind != -1 {
