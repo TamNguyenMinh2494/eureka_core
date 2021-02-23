@@ -103,3 +103,22 @@ func (f *Course) UpdateSection(email string, section *models.CourseSection) erro
 	}
 	return f.CourseSection.Update(*section)
 }
+
+func (f *Course) DeleteSection(email string, courseId string, sectionId string) error {
+	if !f.Course.IsAuthor(courseId, email) {
+		return errors.New("Cannot delete nonpossession course")
+	}
+	sections, err := f.CourseSection.GetSectionsByCourse(courseId)
+	if err != nil {
+		return err
+	}
+	ind, _ := utils.Find(sections, func(index int, elem interface{}) bool {
+		s := elem.(models.CourseSection)
+		return s.Id.String() != sectionId && s.Parent == sectionId
+	})
+
+	if ind != -1 {
+		return errors.New("This section is not empty")
+	}
+	return f.CourseSection.Delete(courseId)
+}

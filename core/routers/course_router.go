@@ -190,10 +190,7 @@ func (r *CourseRouter) Connect(s *core.Server) {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
 
-		if !course.IsAuthor(section.CourseId, authUser["email"].(string)) {
-			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{"message": "Cannot modify nonpossession course"})
-		}
-		err = courseSection.Update(*section)
+		err = courseFlow.UpdateSection(authUser["email"].(string), section)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
@@ -224,21 +221,9 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		courseId := c.QueryParam("course")
 		sectionId := c.QueryParam("section")
 
-		if !courseSection.HasSection(sectionId, courseId) {
-			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{"message": "The course does not contain this section"})
-		}
-
-		selectedCourse, err := course.GetOneById(courseId)
+		err = courseFlow.DeleteSection(authUser["email"].(string), courseId, sectionId)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-		}
-		if !course.IsAuthor(selectedCourse.Id, authUser["email"].(string)) {
-			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{"message": "Cannot delete nonpossession course"})
-		}
-
-		err = courseSection.Delete(sectionId)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 		return c.NoContent(http.StatusOK)
 	}, s.AuthWiddlewareJWT.Auth)
