@@ -197,9 +197,23 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		return c.NoContent(http.StatusOK)
 	}, s.AuthWiddlewareJWT.Auth)
 
-	// r.g.PUT("/quiz", func(c echo.Context) error {
+	r.g.PUT("/quiz", func(c echo.Context) error {
+		authUser := c.Get("user").(map[string]interface{})
+		quiz := new(models.Quiz)
 
-	// })
+		if err = c.Bind(section); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		if err = c.Validate(section); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+
+		err = courseFlow.UpdateSection(authUser["email"].(string), section)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		return c.NoContent(http.StatusOK)
+	}, s.AuthWiddlewareJWT.Auth)
 
 	r.g.DELETE("/", func(c echo.Context) (err error) {
 		authUser := c.Get("user").(map[string]interface{})
