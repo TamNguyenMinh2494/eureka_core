@@ -43,7 +43,7 @@ func (b *CourseSectionBusiness) Create(section *models.CourseSection) error {
 
 func (b *CourseSectionBusiness) Update(section models.CourseSection) error {
 	updatedResult := b.DB.Collection("course_sections").FindOneAndUpdate(context.TODO(),
-		bson.M{"_id": section.Id.String()},
+		bson.M{"_id": section.Id},
 		bson.M{"$set": section})
 	if updatedResult.Err() != nil {
 		return updatedResult.Err()
@@ -52,7 +52,11 @@ func (b *CourseSectionBusiness) Update(section models.CourseSection) error {
 }
 
 func (b *CourseSectionBusiness) Delete(id string) error {
-	_, err := b.DB.Collection("course_sections").DeleteOne(context.TODO(), bson.M{"_id": id})
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	_, err = b.DB.Collection("course_sections").DeleteOne(context.TODO(), bson.M{"_id": objectId})
 	if err != nil {
 		return err
 	}
