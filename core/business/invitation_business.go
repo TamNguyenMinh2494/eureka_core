@@ -14,7 +14,7 @@ type InvitationBusiness struct {
 }
 
 func (b *InvitationBusiness) IsInvited(invitation *models.StudentInvitation) bool {
-	r := b.DB.Collection("course_invitations").FindOne(context.TODO(), bson.M{"course_id": invitation.CourseId, "email": invitation.Email})
+	r := b.DB.Collection("course_invitations").FindOne(context.TODO(), bson.M{"courseid": invitation.CourseId, "email": invitation.Email})
 	return r.Err() == nil
 }
 

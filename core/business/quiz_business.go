@@ -25,7 +25,7 @@ func (b *QuizBusiness) GetById(id string) (models.Quiz, error) {
 }
 
 func (b *QuizBusiness) GetByCourse(courseId string) ([]models.Quiz, error) {
-	cursor, err := b.DB.Collection("question_bank").Find(context.TODO(), bson.M{"course_id": courseId})
+	cursor, err := b.DB.Collection("question_bank").Find(context.TODO(), bson.M{"courseid": courseId})
 	if err != nil {
 		return nil, err
 	}

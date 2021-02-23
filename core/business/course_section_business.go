@@ -13,7 +13,7 @@ type CourseSectionBusiness struct {
 }
 
 func (b *CourseSectionBusiness) GetSectionsByCourse(courseId string) ([]models.CourseSection, error) {
-	cursor, err := b.DB.Collection("course_sections").Find(context.TODO(), bson.M{"course_id": courseId})
+	cursor, err := b.DB.Collection("course_sections").Find(context.TODO(), bson.M{"courseid": courseId})
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func (b *CourseSectionBusiness) GetSectionsByCourse(courseId string) ([]models.C
 }
 
 func (b *CourseSectionBusiness) HasSection(courseId string, sectionId string) bool {
-	r := b.DB.Collection("course_sections").FindOne(context.TODO(), bson.M{"course_id": courseId, "_id": sectionId})
+	r := b.DB.Collection("course_sections").FindOne(context.TODO(), bson.M{"courseid": courseId, "_id": sectionId})
 	return r.Err() == nil
 }
 

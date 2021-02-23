@@ -34,12 +34,12 @@ func (b *CourseBusiness) GetOneById(id string) (models.Course, error) {
 }
 
 func (b *CourseBusiness) IsAuthor(courseId string, email string) bool {
-	r := b.DB.Collection("courses").FindOne(context.TODO(), bson.M{"id": courseId, "author_email": email})
+	r := b.DB.Collection("courses").FindOne(context.TODO(), bson.M{"id": courseId, "authoremail": email})
 	return r.Err() == nil
 }
 
 func (b *CourseBusiness) GetByAuthor(email string) ([]models.Course, error) {
-	cursor, err := b.DB.Collection("courses").Find(context.TODO(), bson.M{"author_email": email})
+	cursor, err := b.DB.Collection("courses").Find(context.TODO(), bson.M{"authoremail": email})
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (b *CourseBusiness) GetByAuthor(email string) ([]models.Course, error) {
 }
 
 func (b *CourseBusiness) GetPublic() ([]models.Course, error) {
-	cursor, err := b.DB.Collection("courses").Find(context.TODO(), bson.M{"is_public": true})
+	cursor, err := b.DB.Collection("courses").Find(context.TODO(), bson.M{"ispublic": true})
 	if err != nil {
 		return nil, err
 	}

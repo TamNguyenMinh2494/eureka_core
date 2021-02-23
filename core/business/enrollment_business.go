@@ -15,7 +15,7 @@ type EnrollmentBusiness struct {
 }
 
 func (b *EnrollmentBusiness) IsEnroll(courseId string, email string) bool {
-	r := b.DB.Collection("enrollments").FindOne(context.TODO(), bson.M{"course_id": courseId, "email": email})
+	r := b.DB.Collection("enrollments").FindOne(context.TODO(), bson.M{"courseid": courseId, "email": email})
 	return r.Err() == nil
 }
 
@@ -43,7 +43,7 @@ func (b *EnrollmentBusiness) cursorToEnrollments(cursor *mongo.Cursor) (enrollme
 	return enrollments, nil
 }
 func (b *EnrollmentBusiness) GetByCourseId(courseId string) ([]models.Enrollment, error) {
-	cursor, err := b.DB.Collection("enrollments").Find(context.TODO(), bson.M{"course_id": courseId})
+	cursor, err := b.DB.Collection("enrollments").Find(context.TODO(), bson.M{"courseid": courseId})
 	if err != nil {
 		return nil, err
 	}
