@@ -10,7 +10,8 @@ import (
 )
 
 type ExamBusiness struct {
-	DB *mongo.Database
+	DB           *mongo.Database
+	QuizSelector *QuizSelectorBusiness
 }
 
 func (b *ExamBusiness) GetById(examId string) (models.Exams, error) {
@@ -45,4 +46,25 @@ func (b *ExamBusiness) Delete(examId string) error {
 	}
 	_, err = b.DB.Collection("exams").DeleteOne(context.TODO(), bson.M{"_id": objectId})
 	return err
+}
+
+func (b *ExamBusiness) Preview(examId string) (models.TakenExams, error) {
+	takenExam := new(models.TakenExams)
+	exam, err := b.GetById(examId)
+	if err != nil {
+		return *takenExam, nil
+	}
+	return b.QuizSelector.Select("", &exam)
+}
+
+func (b *ExamBusiness) Take(email string, examId string) (models.TakenExams, error) {
+	takenExam := *new(models.TakenExams)
+	exam, err := b.GetById(examId)
+	if err != nil {
+		return takenExam, nil
+	}
+	takenExam, err = b.QuizSelector.Select(email, &exam)
+	if err != nil {
+		return takenExam, nil
+	}
 }

@@ -5,7 +5,6 @@ import (
 	"main/core/models"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -23,15 +22,11 @@ func (b *CourseBusiness) CreateIndexes() {
 
 func (b *CourseBusiness) GetOneById(id string) (models.Course, error) {
 	course := new(models.Course)
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return *course, err
-	}
-	result := b.DB.Collection("courses").FindOne(context.TODO(), bson.M{"_id": objectId})
+	result := b.DB.Collection("courses").FindOne(context.TODO(), bson.M{"id": id})
 	if result.Err() != nil {
 		return *course, result.Err()
 	}
-	err = result.Decode(course)
+	err := result.Decode(course)
 	if err != nil {
 		return *course, err
 	}
