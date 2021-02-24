@@ -67,4 +67,5 @@ func (b *ExamBusiness) Take(email string, examId string) (models.TakenExams, err
 	if err != nil {
 		return takenExam, nil
 	}
+	return takenExam, nil
 }

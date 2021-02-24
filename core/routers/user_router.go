@@ -129,17 +129,6 @@ func (r *UserRouter) Connect(s *core.Server) {
 			return echo.NewHTTPError(http.StatusBadRequest, "Cannot access the course")
 		}
 
-		err = transaction.Purchase(&account, &models.Transaction{
-			Email:     authUser["email"].(string),
-			SKU:       courseId,
-			Quantity:  1,
-			Amount:    -enrollingCourse.Fee,
-			Timestamp: time.Now().Unix(),
-		})
-		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-		}
-
 		err = enrollment.Enroll(&models.Enrollment{
 			Id:       primitive.NewObjectID(),
 			CourseID: courseId,
@@ -147,6 +136,17 @@ func (r *UserRouter) Connect(s *core.Server) {
 			Date:     time.Now().Unix(),
 		})
 
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+
+		err = transaction.Purchase(&account, &models.Transaction{
+			Email:     authUser["email"].(string),
+			SKU:       courseId,
+			Quantity:  1,
+			Amount:    -enrollingCourse.Fee,
+			Timestamp: time.Now().Unix(),
+		})
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
