@@ -153,7 +153,10 @@ func (r *CourseRouter) Connect(s *core.Server) {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
 
-		courseFlow.CreateQuiz(authUser["email"].(string), courseId, quiz)
+		err = courseFlow.CreateQuiz(authUser["email"].(string), courseId, quiz)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
 		return c.NoContent(http.StatusOK)
 	}, s.AuthWiddlewareJWT.Auth)
 
@@ -197,18 +200,19 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		return c.NoContent(http.StatusOK)
 	}, s.AuthWiddlewareJWT.Auth)
 
-	r.g.PUT("/quiz", func(c echo.Context) error {
+	r.g.PUT("/quiz", func(c echo.Context) (err error) {
 		authUser := c.Get("user").(map[string]interface{})
+		courseId := c.QueryParam("course")
 		quiz := new(models.Quiz)
 
-		if err = c.Bind(section); err != nil {
+		if err = c.Bind(quiz); err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
-		if err = c.Validate(section); err != nil {
+		if err = c.Validate(quiz); err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
 
-		err = courseFlow.UpdateSection(authUser["email"].(string), section)
+		err = courseFlow.UpdateQuiz(authUser["email"].(string), courseId, quiz)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}

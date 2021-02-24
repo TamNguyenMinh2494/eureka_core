@@ -35,20 +35,21 @@ func (b *QuizBusiness) GetByCourse(courseId string) ([]models.Quiz, error) {
 		return nil, err
 	}
 
-	quizes := make([]models.Quiz, 0)
+	quizzes := make([]models.Quiz, 0)
 
 	for cursor.Next(context.TODO()) {
 		quiz := new(models.Quiz)
 		err = cursor.Decode(quiz)
 		if err != nil {
-			return quizes, err
+			return quizzes, err
 		}
-		quizes = append(quizes, *quiz)
+		quizzes = append(quizzes, *quiz)
 	}
-	return quizes, nil
+	return quizzes, nil
 }
 
 func (b *QuizBusiness) Create(quiz *models.Quiz) error {
+	quiz.Id = primitive.NewObjectID()
 	_, err := b.DB.Collection("question_bank").InsertOne(context.TODO(), quiz)
 	return err
 }
