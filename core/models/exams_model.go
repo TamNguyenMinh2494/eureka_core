@@ -15,5 +15,5 @@ type TakenExams struct {
 	Id          primitive.ObjectID `bson:"_id" json:"id"`
 	Examinee    string             `json:"examinee"`
 	CreatedDate int64              `json:"createddate"`
-	quizzes     []Quiz             `json:"quizzes"`
+	Quizzes     []Quiz             `json:"quizzes"`
 }
