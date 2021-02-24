@@ -130,10 +130,11 @@ func (r *UserRouter) Connect(s *core.Server) {
 		}
 
 		err = transaction.Purchase(&account, &models.Transaction{
-			Email:    authUser["email"].(string),
-			SKU:      courseId,
-			Quantity: 1,
-			Amount:   -enrollingCourse.Fee,
+			Email:     authUser["email"].(string),
+			SKU:       courseId,
+			Quantity:  1,
+			Amount:    -enrollingCourse.Fee,
+			Timestamp: time.Now().Unix(),
 		})
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
