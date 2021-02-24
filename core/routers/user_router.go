@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type UserRouter struct {
@@ -134,6 +135,17 @@ func (r *UserRouter) Connect(s *core.Server) {
 			Quantity: 1,
 			Amount:   -enrollingCourse.Fee,
 		})
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+
+		err = enrollment.Enroll(&models.Enrollment{
+			Id:       primitive.NewObjectID(),
+			CourseID: courseId,
+			Email:    authUser["email"].(string),
+			Date:     time.Now().Unix(),
+		})
+
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}

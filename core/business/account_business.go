@@ -48,12 +48,12 @@ func (b *AccountBusiness) Charge(email string, amount int64) error {
 	if err != nil {
 		return err
 	}
-	if account.Balance < -amount {
+	if account.Balance < amount {
 		return errors.New("Balance is not enough")
 	}
 	result := b.DB.Collection("accounts").FindOneAndUpdate(context.TODO(),
 		bson.M{"email": email},
-		bson.D{{"$inc", bson.D{{"amount", amount}}}})
+		bson.D{{"$inc", bson.D{{"balance", -1 * amount}}}})
 	if result.Err() != nil {
 		return result.Err()
 	}
