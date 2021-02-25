@@ -38,7 +38,7 @@ func (b *TransactionBusiness) Get(email string, sku string) ([]models.Transactio
 	}
 	transactions := make([]models.Transaction, 0)
 	for cursor.Next(context.TODO()) {
-		var trans *models.Transaction
+		trans := new(models.Transaction)
 		err = cursor.Decode(trans)
 		if err != nil {
 			return nil, err

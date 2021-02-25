@@ -64,7 +64,7 @@ func (r *UserRouter) Connect(s *core.Server) {
 		authUser := c.Get("user").(map[string]interface{})
 		transactions, err := transaction.Get(authUser["email"].(string), "")
 		if err != nil {
-			return echo.ErrInternalServerError
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
 		return c.JSON(http.StatusOK, transactions)
 	}, s.AuthWiddlewareJWT.Auth)
