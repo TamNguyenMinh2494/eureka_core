@@ -11,6 +11,7 @@ type Quiz struct {
 	CourseId      string             `json:"course_id" validate:"required"`
 	Question      string             `json:"question" validate:"required"`
 	Answer        string             `json:"answer,omitempty"`
+	Score         float32            `json:"score,omitempty"`
 	CorrectAnswer string             `json:"correctanswer" validate:"required"`
 	Type          string             `json:"type" validate:"required"`
 	LastUpdate    int64              `json:"last_update"`

@@ -9,6 +9,7 @@ type Exams struct {
 	Title        string             `json:"title" validate:"required"`
 	SectionId    string             `json:"sectionid" validate:"required"`
 	QuizSelector []QuizSelector     `json:"quiz_selector"`
+	Duration     int64              `json:"duration" validate:"required"`
 }
 
 type TakenExams struct {
@@ -16,4 +17,14 @@ type TakenExams struct {
 	Examinee    string             `json:"examinee"`
 	CreatedDate int64              `json:"createddate"`
 	Quizzes     []Quiz             `json:"quizzes"`
+	Duration    int64              `json:"duration"`
+}
+
+type SubmittedExams struct {
+	Id         primitive.ObjectID `bson:"_id" json:"id"`
+	Examinee   string             `json:"examinee"`
+	Quizzes    []Quiz             `json:"quizzes"`
+	Score      float32            `json:"score"`
+	TotalScore float32            `json:"totalscore"`
+	SubmitDate int64              `json:"submitdate"`
 }

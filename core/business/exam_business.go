@@ -2,7 +2,9 @@ package business
 
 import (
 	"context"
+	"errors"
 	"main/core/models"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -12,6 +14,7 @@ import (
 type ExamBusiness struct {
 	DB           *mongo.Database
 	QuizSelector *QuizSelectorBusiness
+	Quiz         *QuizBusiness
 }
 
 func (b *ExamBusiness) GetById(examId string) (models.Exams, error) {
@@ -26,6 +29,48 @@ func (b *ExamBusiness) GetById(examId string) (models.Exams, error) {
 	}
 	err = r.Decode(exam)
 	return *exam, err
+}
+
+func (b *ExamBusiness) GetExamsBySectionId(sectionId string) ([]models.Exams, error) {
+	exams := make([]models.Exams, 0)
+	cursor, err := b.DB.Collection("taken_exams").Find(context.TODO(), bson.M{"sectionId": sectionId})
+	if err != nil {
+		return exams, nil
+	}
+	for cursor.Next(context.TODO()) {
+		exam := new(models.Exams)
+		cursor.Decode(exam)
+		exams = append(exams, *exam)
+	}
+	return exams, nil
+}
+
+func (b *ExamBusiness) GetTakenExamById(takenExamId string) (*models.TakenExams, error) {
+	takenExam := new(models.TakenExams)
+	objectId, err := primitive.ObjectIDFromHex(takenExamId)
+	if err != nil {
+		return takenExam, err
+	}
+	r := b.DB.Collection("taken_exams").FindOne(context.TODO(), bson.M{"_id": objectId})
+	if r.Err() != nil {
+		return takenExam, r.Err()
+	}
+	err = r.Decode(takenExam)
+	return takenExam, err
+}
+
+func (b *ExamBusiness) GetTakenExams(examinee string) ([]models.TakenExams, error) {
+	takenExams := make([]models.TakenExams, 0)
+	cursor, err := b.DB.Collection("taken_exams").Find(context.TODO(), bson.M{"examinee": examinee})
+	if err != nil {
+		return takenExams, nil
+	}
+	for cursor.Next(context.TODO()) {
+		takenExam := new(models.TakenExams)
+		cursor.Decode(takenExam)
+		takenExams = append(takenExams, *takenExam)
+	}
+	return takenExams, nil
 }
 
 func (b *ExamBusiness) Create(exam *models.Exams) error {
@@ -67,5 +112,54 @@ func (b *ExamBusiness) Take(email string, examId string) (models.TakenExams, err
 	if err != nil {
 		return takenExam, nil
 	}
+	takenExam.CreatedDate = time.Now().UnixNano()
 	return takenExam, nil
 }
+
+func (b *ExamBusiness) GetSubmit(takenExamId string) (*models.SubmittedExams, error) {
+	submittedExam := new(models.SubmittedExams)
+	objectId, err := primitive.ObjectIDFromHex(takenExamId)
+
+	if err != nil {
+		return submittedExam, err
+	}
+	r := b.DB.Collection("submissions").FindOne(context.TODO(), bson.M{"_id": objectId})
+	if r.Err() != nil {
+		return submittedExam, r.Err()
+	}
+	err = r.Decode(submittedExam)
+	return submittedExam, err
+}
+
+func (b *ExamBusiness) Submit(answerSheet *models.SubmittedExams) error {
+	_, err := b.GetTakenExamById(answerSheet.Id.Hex())
+	if err != nil {
+		return errors.New("Cannot submit to inexisted exam")
+	}
+
+	var totalScore float32 = 0
+	var score float32 = 0
+
+	for i, rawQuiz := range answerSheet.Quizzes {
+		structuredQuiz, err := b.Quiz.Parse(&rawQuiz)
+		if err != nil {
+			continue
+		}
+		s := structuredQuiz.Question.CheckAnswer(rawQuiz.Answer)
+		if s > 0 {
+			totalScore += s
+		}
+		score += s
+		answerSheet.Quizzes[i].Score = score
+	}
+
+	answerSheet.Score = score
+	answerSheet.TotalScore = totalScore
+	answerSheet.SubmitDate = time.Now().UnixNano()
+
+	_, err = b.DB.Collection("submissions").InsertOne(context.TODO(), answerSheet)
+
+	return err
+}
+
+//func (b *ExamBusiness)
