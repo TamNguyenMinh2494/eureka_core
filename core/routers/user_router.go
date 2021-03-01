@@ -3,6 +3,7 @@ package routers
 import (
 	"main/core"
 	"main/core/business"
+	"main/core/middlewares"
 	"main/core/models"
 	"net/http"
 	"time"
@@ -106,7 +107,7 @@ func (r *UserRouter) Connect(s *core.Server) {
 		}
 
 		return c.JSON(http.StatusOK, profile)
-	}, s.AuthWiddlewareJWT.Auth)
+	}, s.AuthWiddlewareJWT.Auth, middlewares.Permit("admin"))
 
 	r.g.POST("/enroll", func(c echo.Context) error {
 		authUser := c.Get("user").(map[string]interface{})
