@@ -7,7 +7,8 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello, world")
+	fmt.Println("Eureka Core...")
+	fmt.Println("8==> Start")
 	server := core.Server{}
 	server.LoadConfig("config.json")
 	server.Create()
@@ -16,6 +17,7 @@ func main() {
 		&routers.AuthRouter{Name: "v1/auth"},
 		&routers.UserRouter{Name: "v1/users"},
 		&routers.CourseRouter{Name: "v1/courses"},
+		&routers.ExamRouter{Name: "v1/exams"},
 	}
 
 	server.ConnectRouters()

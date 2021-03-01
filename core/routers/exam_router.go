@@ -68,6 +68,26 @@ func (r *ExamRouter) Connect(s *core.Server) {
 		}
 		return c.JSON(http.StatusOK, takenExam)
 	}, s.AuthWiddlewareJWT.Auth)
+	r.g.GET("/take", func(c echo.Context) error {
+		userAuth := c.Get("user").(map[string]interface{})
+		courseId := c.QueryParam("course")
+		examId := c.QueryParam("exam")
+		takenExam, err := exam.TakeExam(userAuth["email"].(string), courseId, examId)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		return c.JSON(http.StatusOK, takenExam)
+	}, s.AuthWiddlewareJWT.Auth)
+	r.g.GET("/preview", func(c echo.Context) error {
+		userAuth := c.Get("user").(map[string]interface{})
+		courseId := c.QueryParam("course")
+		examId := c.QueryParam("exam")
+		takenExam, err := exam.PreviewExam(userAuth["email"].(string), courseId, examId)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		return c.JSON(http.StatusBadRequest, takenExam)
+	}, s.AuthWiddlewareJWT.Auth)
 	r.g.POST("/", func(c echo.Context) error {
 		userAuth := c.Get("user").(map[string]interface{})
 		courseId := c.QueryParam("course")

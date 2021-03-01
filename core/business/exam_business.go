@@ -112,8 +112,12 @@ func (b *ExamBusiness) Take(email string, examId string) (models.TakenExams, err
 	if err != nil {
 		return takenExam, nil
 	}
+	for i := range takenExam.Quizzes {
+		takenExam.Quizzes[i].CorrectAnswer = ""
+	}
 	takenExam.CreatedDate = time.Now().UnixNano()
-	return takenExam, nil
+	_, err = b.DB.Collection("taken_exams").InsertOne(context.TODO(), takenExam)
+	return takenExam, err
 }
 
 func (b *ExamBusiness) GetSubmit(takenExamId string) (*models.SubmittedExams, error) {
