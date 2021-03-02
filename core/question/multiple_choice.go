@@ -7,6 +7,7 @@ type SingleChoice struct {
 }
 
 type MultipleChoice struct {
+	Prompt  string         `json:"prompt"`
 	Choices []SingleChoice `json:"choices"`
 }
 
