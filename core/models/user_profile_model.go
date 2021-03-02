@@ -3,7 +3,7 @@ package models
 type UserProfile struct {
 	DisplayName string `json:"display_name" validate:"required"`
 	Email       string `json:"email" validate:"required,email"`
-	PhoneNumber string `json:"phone_number" validate:"required"`
+	PhoneNumber string `json:"phone_number" `
 	Gender      string `json:"gender" validate:"required"`
 	DOB         uint64 `json:"dob" validate:"required"`
 	Role        string `json:"role"`

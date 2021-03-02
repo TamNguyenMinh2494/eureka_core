@@ -3,6 +3,7 @@ package business
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"main/core/models"
 	"main/core/question"
 
@@ -76,7 +77,7 @@ func (b *QuizBusiness) Parse(quiz *models.Quiz) (models.StructuredQuiz, error) {
 	structuredQuiz := new(models.StructuredQuiz)
 	structuredQuiz.Raw = *quiz
 	switch structuredQuiz.Raw.Type {
-	case "multiple_choice":
+	case "multiple_choices":
 		question := new(question.MultipleChoice)
 		err := json.Unmarshal([]byte(quiz.Question), question)
 		if err != nil {
@@ -84,6 +85,8 @@ func (b *QuizBusiness) Parse(quiz *models.Quiz) (models.StructuredQuiz, error) {
 		}
 		structuredQuiz.Question = question
 		break
+	default:
+		return *structuredQuiz, errors.New("Unknown question type: " + structuredQuiz.Raw.Type)
 	}
 
 	return *structuredQuiz, nil
