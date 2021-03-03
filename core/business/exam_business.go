@@ -116,8 +116,9 @@ func (b *ExamBusiness) Take(email string, examId string) (models.TakenExams, err
 		takenExam.Quizzes[i].CorrectAnswer = ""
 	}
 	takenExam.CreatedDate = time.Now().UnixNano()
-	_, err = b.DB.Collection("taken_exams").InsertOne(context.TODO(), takenExam)
 	takenExam.Duration = exam.Duration
+	_, err = b.DB.Collection("taken_exams").InsertOne(context.TODO(), takenExam)
+
 	return takenExam, err
 }
 
