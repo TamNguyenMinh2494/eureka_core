@@ -139,29 +139,30 @@ func (f *Exam) PreviewExam(email string, courseId string, examId string) (models
 	return f.Exam.Preview(examId)
 }
 
-func (f *Exam) TakeExam(examinee string, courseId string, examId string) (models.TakenExams, error) {
+func (f *Exam) TakeExam(examinee string, courseId string, examId string) (*models.TakenExams, error) {
 	takenExam := new(models.TakenExams)
 	if !f.Enrollment.IsEnroll(courseId, examinee) {
-		return *takenExam, errors.New("Cannot take exam for unenrolled course")
+		return takenExam, errors.New("Cannot take exam for unenrolled course")
 	}
 
 	sections, err := f.CourseSection.GetSectionsByCourse(courseId)
 	if err != nil {
-		return *takenExam, err
+		return takenExam, err
 	}
 
 	exam, err := f.Exam.GetById(examId)
 	if err != nil {
-		return *takenExam, err
+		return takenExam, err
 	}
 	ind, _ := utils.Find(sections, func(index int, elem interface{}) bool {
 		return elem.(models.CourseSection).Id.Hex() == exam.SectionId
 	})
 	if ind == -1 {
-		return *takenExam, errors.New("Cannot take exam")
+		return takenExam, errors.New("Cannot take exam")
 	}
 
-	return f.Exam.Take(examinee, examId)
+	t, err := f.Exam.Take(examinee, examId)
+	return t, err
 }
 
 func (f *Exam) SubmitExam(courseId string, submission *models.SubmittedExams) error {

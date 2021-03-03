@@ -102,15 +102,15 @@ func (b *ExamBusiness) Preview(examId string) (models.TakenExams, error) {
 	return b.QuizSelector.Select("", &exam)
 }
 
-func (b *ExamBusiness) Take(email string, examId string) (models.TakenExams, error) {
+func (b *ExamBusiness) Take(email string, examId string) (*models.TakenExams, error) {
 	takenExam := *new(models.TakenExams)
 	exam, err := b.GetById(examId)
 	if err != nil {
-		return takenExam, nil
+		return &takenExam, nil
 	}
 	takenExam, err = b.QuizSelector.Select(email, &exam)
 	if err != nil {
-		return takenExam, nil
+		return &takenExam, nil
 	}
 	for i := range takenExam.Quizzes {
 		takenExam.Quizzes[i].CorrectAnswer = ""
@@ -118,7 +118,6 @@ func (b *ExamBusiness) Take(email string, examId string) (models.TakenExams, err
 	takenExam.CreatedDate = time.Now().UnixNano()
 	takenExam.Duration = exam.Duration
 	_, err = b.DB.Collection("taken_exams").InsertOne(context.TODO(), takenExam)
-
 	return takenExam, err
 }
 
