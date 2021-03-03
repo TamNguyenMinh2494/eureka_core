@@ -160,6 +160,7 @@ func (f *Exam) TakeExam(examinee string, courseId string, examId string) (models
 	if ind == -1 {
 		return *takenExam, errors.New("Cannot take exam")
 	}
+
 	return f.Exam.Take(examinee, examId)
 }
 

@@ -23,6 +23,11 @@ func (b *QuizSelectorBusiness) Select(email string, exam *models.Exams) (models.
 			if err != nil {
 				return *takenExams, err
 			}
+			// _, err := b.Quiz.Parse(&q)
+			// if err != nil {
+			// 	return *takenExams, errors.New("Invalid question [" + q.Id.Hex() + "]")
+			// }
+
 			list = append(list, q)
 		}
 		if selector.Shuffle {

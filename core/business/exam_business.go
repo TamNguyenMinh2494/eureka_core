@@ -157,7 +157,6 @@ func (b *ExamBusiness) Submit(answerSheet *models.SubmittedExams) error {
 		score += s
 		answerSheet.Quizzes[i].Score = score
 	}
-
 	answerSheet.Score = score
 	answerSheet.TotalScore = totalScore
 	answerSheet.SubmitDate = time.Now().UnixNano()

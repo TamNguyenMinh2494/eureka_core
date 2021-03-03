@@ -10,6 +10,7 @@ import (
 	"firebase.google.com/go/v4/auth"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/api/option"
@@ -48,6 +49,8 @@ func (server *Server) LoadConfig(configFile string) {
 
 func (server *Server) Create() {
 	server.Echo = echo.New()
+
+	server.Echo.Use(middleware.CORS())
 
 	server.Echo.Validator = &Validator{validator: validator.New()}
 
@@ -107,6 +110,7 @@ func (server *Server) Create() {
 
 	server.AuthMiddleware = authMiddleware
 	server.AuthWiddlewareJWT = middlewares.NewAuthMiddleware(server.Config.AuthSecret)
+
 }
 
 func (server *Server) Start(address string) {
