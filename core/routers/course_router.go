@@ -254,4 +254,16 @@ func (r *CourseRouter) Connect(s *core.Server) {
 		return c.NoContent(http.StatusOK)
 	}, s.AuthWiddlewareJWT.Auth)
 
+	r.g.DELETE("/quiz", func(c echo.Context) (err error) {
+		authUser := c.Get("user").(map[string]interface{})
+		courseId := c.QueryParam("course")
+		quizId := c.QueryParam("quiz")
+
+		err = courseFlow.DeleteQuiz(authUser["email"].(string), courseId, quizId)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		return c.NoContent(http.StatusOK)
+	}, s.AuthWiddlewareJWT.Auth)
+
 }

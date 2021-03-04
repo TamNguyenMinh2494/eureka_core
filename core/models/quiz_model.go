@@ -9,6 +9,7 @@ import (
 type Quiz struct {
 	Id            primitive.ObjectID `bson:"_id" json:"id,omitempty"`
 	CourseId      string             `json:"course_id" validate:"required"`
+	Title         string             `json:"title"`
 	Question      string             `json:"question" validate:"required"`
 	Answer        string             `json:"answer,omitempty"`
 	Score         float32            `json:"score,omitempty"`
