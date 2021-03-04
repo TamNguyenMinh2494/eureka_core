@@ -6,6 +6,7 @@ import (
 	"errors"
 	"main/core/models"
 	"main/core/question"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -50,6 +51,7 @@ func (b *QuizBusiness) GetByCourse(courseId string) ([]models.Quiz, error) {
 }
 
 func (b *QuizBusiness) Create(quiz *models.Quiz) error {
+	quiz.LastUpdate = time.Now().UnixNano()
 	quiz.Id = primitive.NewObjectID()
 	_, err := b.DB.Collection("question_bank").InsertOne(context.TODO(), quiz)
 	return err

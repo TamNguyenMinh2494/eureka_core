@@ -12,7 +12,7 @@ type Quiz struct {
 	Question      string             `json:"question" validate:"required"`
 	Answer        string             `json:"answer,omitempty"`
 	Score         float32            `json:"score,omitempty"`
-	CorrectAnswer string             `json:"correctanswer" validate:"required"`
+	CorrectAnswer string             `json:"correctanswer"`
 	Type          string             `json:"type" validate:"required"`
 	LastUpdate    int64              `json:"last_update"`
 }
