@@ -120,5 +120,5 @@ func (f *Course) DeleteSection(email string, courseId string, sectionId string) 
 	if ind != -1 {
 		return errors.New("This section is not empty")
 	}
-	return f.CourseSection.Delete(courseId)
+	return f.CourseSection.Delete(sectionId)
 }
