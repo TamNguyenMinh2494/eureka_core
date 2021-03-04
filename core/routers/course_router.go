@@ -74,6 +74,14 @@ func (r *CourseRouter) Connect(s *core.Server) {
 
 	r.g.GET("/sections", func(c echo.Context) error {
 		courseId := c.QueryParam("course")
+		parentId := c.QueryParam("parent")
+		if parentId != "" {
+			sections, err := courseSection.GetSectionsByParent(courseId, parentId)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+			}
+			return c.JSON(http.StatusOK, sections)
+		}
 		sections, err := courseSection.GetSectionsByCourse(courseId)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -175,7 +183,7 @@ func (r *CourseRouter) Connect(s *core.Server) {
 			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{"message": "Cannot modify nonpossession course"})
 		}
 
-		err = course.Update(updatedCourse.Id, *updatedCourse)
+		err = course.Update(updatedCourse.Id, authUser["email"].(string), *updatedCourse)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}

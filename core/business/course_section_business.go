@@ -30,6 +30,20 @@ func (b *CourseSectionBusiness) GetSectionsByCourse(courseId string) ([]models.C
 	return sections, nil
 }
 
+func (b *CourseSectionBusiness) GetSectionsByParent(courseId string, parentId string) ([]models.CourseSection, error) {
+	sections, err := b.GetSectionsByCourse(courseId)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]models.CourseSection, 0)
+	for _, section := range sections {
+		if section.Parent == parentId {
+			result = append(result, section)
+		}
+	}
+	return result, nil
+}
+
 func (b *CourseSectionBusiness) HasSection(courseId string, sectionId string) bool {
 	r := b.DB.Collection("course_sections").FindOne(context.TODO(), bson.M{"courseid": courseId, "id": sectionId})
 	return r.Err() == nil

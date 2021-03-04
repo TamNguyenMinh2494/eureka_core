@@ -82,7 +82,8 @@ func (b *CourseBusiness) Create(course models.Course) error {
 	return nil
 }
 
-func (b *CourseBusiness) Update(id string, course models.Course) error {
+func (b *CourseBusiness) Update(id string, email string, course models.Course) error {
+	course.AuthorEmail = email
 	updatedResult := b.DB.Collection("courses").FindOneAndUpdate(context.TODO(),
 		bson.M{"id": id},
 		bson.M{"$set": course})

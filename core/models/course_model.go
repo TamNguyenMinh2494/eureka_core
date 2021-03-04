@@ -5,9 +5,9 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 type Course struct {
 	Id               string `json:"id" validate:"required"` // User-friendly ID
 	Name             string `json:"name" validate:"required"`
-	AuthorName       string `json:"author_name" validate:"required"`
-	AuthorEmail      string `json:"author_email" validate:"required"`
-	Fee              int64  `json:"fee" validate:"required"`
+	AuthorName       string `json:"author_name" `
+	AuthorEmail      string `json:"author_email"`
+	Fee              int64  `json:"fee"`
 	StartDate        int64  `json:"start_date"`
 	AllowEnroll      bool   `json:"allow_enroll" binding:"required"`
 	IsPublic         bool   `json:"is_public" binding:"required"`
