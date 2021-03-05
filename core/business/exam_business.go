@@ -129,7 +129,7 @@ func (b *ExamBusiness) Take(email string, examId string) (*models.TakenExams, er
 	for i := range takenExam.Quizzes {
 		takenExam.Quizzes[i].CorrectAnswer = ""
 	}
-	takenExam.CreatedDate = time.Now().UnixNano()
+	takenExam.CreatedDate = time.Now().Unix()
 	takenExam.Duration = exam.Duration
 	_, err = b.DB.Collection("taken_exams").InsertOne(context.TODO(), takenExam)
 	return &takenExam, err
@@ -173,7 +173,7 @@ func (b *ExamBusiness) Submit(answerSheet *models.SubmittedExams) error {
 	}
 	answerSheet.Score = score
 	answerSheet.TotalScore = totalScore
-	answerSheet.SubmitDate = time.Now().UnixNano()
+	answerSheet.SubmitDate = time.Now().Unix()
 
 	_, err = b.DB.Collection("submissions").InsertOne(context.TODO(), answerSheet)
 

@@ -51,7 +51,7 @@ func (b *QuizBusiness) GetByCourse(courseId string) ([]models.Quiz, error) {
 }
 
 func (b *QuizBusiness) Create(quiz *models.Quiz) error {
-	quiz.LastUpdate = time.Now().UnixNano()
+	quiz.LastUpdate = time.Now().Unix()
 	quiz.Id = primitive.NewObjectID()
 	_, err := b.DB.Collection("question_bank").InsertOne(context.TODO(), quiz)
 	return err
