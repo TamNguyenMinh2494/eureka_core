@@ -119,7 +119,7 @@ func (r *UserRouter) Connect(s *core.Server) {
 		if !enrollingCourse.AllowEnroll {
 			return echo.NewHTTPError(http.StatusBadRequest, "Cannot enroll the course")
 		}
-		if enrollingCourse.StartDate > time.Now().Unix() {
+		if enrollingCourse.StartDate > time.Now().UnixNano() {
 			return echo.NewHTTPError(http.StatusBadRequest, "The course does not start")
 		}
 

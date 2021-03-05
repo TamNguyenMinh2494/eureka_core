@@ -31,6 +31,20 @@ func (b *ExamBusiness) GetById(examId string) (models.Exams, error) {
 	return *exam, err
 }
 
+func (b *ExamBusiness) GetExamsByCourse(courseId string) ([]models.Exams, error) {
+	exams := make([]models.Exams, 0)
+	cursor, err := b.DB.Collection("taken_exams").Find(context.TODO(), bson.M{"courseId": sectionId})
+	if err != nil {
+		return exams, nil
+	}
+	for cursor.Next(context.TODO()) {
+		exam := new(models.Exams)
+		cursor.Decode(exam)
+		exams = append(exams, *exam)
+	}
+	return exams, nil
+}
+
 func (b *ExamBusiness) GetExamsBySectionId(sectionId string) ([]models.Exams, error) {
 	exams := make([]models.Exams, 0)
 	cursor, err := b.DB.Collection("taken_exams").Find(context.TODO(), bson.M{"sectionId": sectionId})
