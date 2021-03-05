@@ -19,3 +19,16 @@ func (q *MultipleChoice) CheckAnswer(answer string) float32 {
 	}
 	return 0
 }
+
+func (q *MultipleChoice) GetMaxScore() float32 {
+	max := float32(0)
+	for _, choice := range q.Choices {
+		if max < choice.Mark {
+			max = choice.Mark
+		}
+	}
+	if max < 0 {
+		return 0
+	}
+	return max
+}

@@ -47,7 +47,7 @@ func (b *ExamBusiness) GetById(examId string) (models.Exams, error) {
 
 func (b *ExamBusiness) GetExamsBySectionId(sectionId string) ([]models.Exams, error) {
 	exams := make([]models.Exams, 0)
-	cursor, err := b.DB.Collection("taken_exams").Find(context.TODO(), bson.M{"sectionId": sectionId})
+	cursor, err := b.DB.Collection("exams").Find(context.TODO(), bson.M{"sectionid": sectionId})
 	if err != nil {
 		return exams, nil
 	}
@@ -165,11 +165,9 @@ func (b *ExamBusiness) Submit(answerSheet *models.SubmittedExams) error {
 			continue
 		}
 		s := structuredQuiz.Question.CheckAnswer(rawQuiz.Answer)
-		if s > 0 {
-			totalScore += s
-		}
+		totalScore += structuredQuiz.Question.GetMaxScore()
 		score += s
-		answerSheet.Quizzes[i].Score = score
+		answerSheet.Quizzes[i].Score = s
 	}
 	answerSheet.Score = score
 	answerSheet.TotalScore = totalScore
